@@ -1,0 +1,14 @@
+{
+	"name": "tab2",
+	"version": "1.0",
+	"description": "override the new tab page with a custom tab page",
+	"permissions": ["storage"],
+	"manifest_version" : 2,
+    "chrome_url_overrides" : {
+    	"newtab": "dis_quill_1.html"
+  	},
+  	"background":{
+		"scripts": ["background.js"],
+		"persistent": false
+	}
+}

@@ -1,0 +1,70 @@
+body{
+	background-color: #def0ff;
+}
+.ql-editor, .ql-toolbar{
+	background-color: white;
+}
+.ql-toolbar{
+	display: block;
+	width:30%;
+	height:30%;
+	/*float:left;*/
+}
+/*.ql-toolbar:after{
+	content: '\A';
+    white-space: pre;
+}*/
+/*.ql-container{
+	display: block;
+	width: 20%;
+	height: 30%;
+	clear:all;
+}*/
+/*#editor{
+	display: inline;
+	clear:all;
+}*/
+#drag{
+	display: inline-block;
+	padding: 0px;
+	width: 100px;
+	height: 15px;
+	margin: 0% 3% 0% 0%;
+	background-color: purple;
+}
+
+#drag:after{
+	content: '\A';
+    white-space: pre;
+}
+
+.ql-toolbar.ql-snow + .ql-container.ql-snow{
+	display: inline-block;
+	width: 30%;
+	height: 30%;
+}
+
+#create_note{
+	display: inline-block;
+	position: relative;
+	left: 90%;
+	top: 400px;
+}
+
+.del_button{
+	display: inline-block;
+}
+/*.one_note,ui-draggable, ui-draggable-handle{
+/*	width: 10%;
+	height: 10%;*/
+
+/*#0{
+	display: block;
+	width: 30%;
+	height: 30%;
+}*/
+/*.ql-editor{
+	display: block;
+	background-color: blue;
+	clear:all;
+}*/
