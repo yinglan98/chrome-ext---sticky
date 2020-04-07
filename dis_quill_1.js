@@ -9,11 +9,7 @@ $(document).ready(function(){
 		store_notes();
 	})
 	window.addEventListener("beforeunload", store_notes);
-	//Note: next line is same as getElementbyId.addEventListener()...
-	// $("#create_note").click(function(){
-	// 	console.log("create note clicked");
-	// 	create_note();
-	// });
+
 	document.getElementById("create_note").addEventListener("click", function(){
 		console.log("create note clicked");
 		create_note();
@@ -172,32 +168,21 @@ function update_notes(){
 
 function create_note(){
 	console.log("create_note called");
-	chrome.storage.local.get("total_num", function(res){
+	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
 		print_runtime_error();
+		// console.log("res.total_num = " + res.total_num);
+		//console.log("res.next_id = " + res.next_id);	
 		let new_tot = (parseInt(res.total_num) + 1).toString();
-		chrome.storage.local.set({"total_num": new_tot}, function(){
-			print_runtime_error();
-			//console.log("create: total_num updated");
-			console.log("create_note: new total_num = ", (parseInt(res.total_num) + 1).toString());
-			chrome.storage.local.get("next_id", function(next_id_res){
+		let new_id = (parseInt(res.next_id) + 1).toString();
+		let new_note_id = res.next_id.toString();
+		(res.id_list).push(new_note_id)
+		chrome.storage.local.set(
+			{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
 				print_runtime_error();
-				chrome.storage.local.set({"next_id":(parseInt(next_id_res.next_id) + 1).toString()}, function(){
-					print_runtime_error();
-					//console.log("create: next_id updated");
-					let new_note_id = parseInt(next_id_res.next_id);
-					chrome.storage.local.get("id_list", function(id_list_result){
-						print_runtime_error();
-						id_list_result.id_list.push(new_note_id.toString());
-						chrome.storage.local.set({"id_list":id_list_result.id_list}, function(){
-							print_runtime_error();
-							console.log("entered");
-	 						create_note_helper(new_note_id.toString());
-						});
-					}); //okay
-				}) //okay
-			}); //okay
-		}); //okay
-	})
+				console.log("create note fin update");
+				create_note_helper(new_note_id);
+		});
+	});	
 }
 
 //Note: the way to get id is dependent on the HTML structure of the note
