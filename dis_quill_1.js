@@ -23,13 +23,8 @@ $(document).ready(function(){
 		if(old_tot === 0){
 			console.log("no notes to start with");
 			let new_tot = old_tot + 1;
-			chrome.storage.local.set({"next_id": "1"}, function(){
-				print_runtime_error();
-			});
-			chrome.storage.local.set({"total_num": "1"}, function(){
-				print_runtime_error();
-			});
-			chrome.storage.local.set({"id_list":["0"]}, function(){
+			chrome.storage.local.set(
+				{"next_id": "1", "total_num": "1", "id_list":["0"]}, function(){
 				print_runtime_error();
 			});
 			//create new note with id
@@ -55,12 +50,7 @@ $(document).ready(function(){
 					update_note(id, quill);
 					//attach event for the newly created note
 					let len = document.getElementsByClassName("ql-editor").length;
-					// document.getElementsByClassName("ql-editor")[len-1].addEventListener("blur", function(){
-					// 	store_note(id, quill);
-					// });
-					// document.getElementsByClassName("ql-editor")[len-1].addEventListener("focus", function(){
-					// 	update_note(id, quill);
-					// });
+
 				}
 			}) //end let
 		} //end else
@@ -194,24 +184,21 @@ function delete_note(e){
     //console.log("del note id = " + id);
 
     //update related values
-    chrome.storage.local.get("total_num", function(res_tot){
-    	chrome.storage.local.set({"total_num" : (parseInt(res_tot.total_num) - 1).toString()}, function(){
-    		chrome.storage.local.get("id_list", function(res_id_list){
-    			//find the index of the id in id_list
-    			ind = res_id_list.id_list.findIndex(elt => elt == id);
-    			console.log("ind to be deleted = " + ind);
-    			console.assert(ind !== -1);
-    			//remove that index
-    			res_id_list.id_list.splice(ind, 1);
-    			chrome.storage.local.set({"id_list": res_id_list.id_list}, function(){
-    				chrome.storage.local.remove([id], function(){
+    chrome.storage.local.get(["total_num", "id_list"], function(res_tot){
+	//find the index of the id in id_list
+		let ind = res_tot.id_list.findIndex(elt => elt == id);
+		console.log("ind to be deleted = " + ind);
+		console.assert(ind !== -1);
+		//remove that index
+		res_tot.id_list.splice(ind, 1);
+    	chrome.storage.local.set(
+    		{"total_num": (parseInt(res_tot.total_num) - 1).toString(), "id_list": res_tot.id_list}, function(){
+    			chrome.storage.local.remove([id], function(){
     					delete map_id_quill[id];
     					console.log("id = " + id);
     					let elt_to_delete = document.querySelector("#note" + id);
     					elt_to_delete.parentNode.removeChild(elt_to_delete);
     				})
-    			});
-    		});
     	});
     });
 }
