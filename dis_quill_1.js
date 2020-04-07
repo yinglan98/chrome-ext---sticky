@@ -10,52 +10,42 @@ $(document).ready(function(){
 	})
 	window.addEventListener("beforeunload", store_notes);
 	//Note: next line is same as getElementbyId.addEventListener()...
-	$("#create_note").click(function(){
-		//console.log("create note clicked");
+	// $("#create_note").click(function(){
+	// 	console.log("create note clicked");
+	// 	create_note();
+	// });
+	document.getElementById("create_note").addEventListener("click", function(){
+		console.log("create note clicked");
 		create_note();
 	});
-	chrome.storage.sync.get("total_num", function(tot_num){
+
+	chrome.storage.local.get("total_num", function(tot_num){
+		print_runtime_error();
 		//no notes yet - create new note
 		let old_tot = parseInt(tot_num.total_num);
 		//console.log("old_tot = ", old_tot);
 		if(old_tot === 0){
 			console.log("no notes to start with");
 			let new_tot = old_tot + 1;
-			chrome.storage.sync.set({"next_id": "1"}, function(){
-				//console.log("init next_id fin");
+			chrome.storage.local.set({"next_id": "1"}, function(){
+				print_runtime_error();
 			});
-			chrome.storage.sync.set({"total_num": "1"}, function(){
-				//console.log("init tot_num fin");
+			chrome.storage.local.set({"total_num": "1"}, function(){
+				print_runtime_error();
 			});
-			chrome.storage.sync.set({"id_list":["0"]}, function(){
-				//console.log("id list init");
+			chrome.storage.local.set({"id_list":["0"]}, function(){
+				print_runtime_error();
 			});
 			//create new note with id
 			create_note_helper("0");
-			// map_id_quill["0"] = new Quill("#editor" + tot_num.total_num, {
-		 //    	theme: 'snow'
-		 //  	});
-		 //  	let quill = map_id_quill["0"];
-			// chrome.storage.sync.set({"0": quill.getContents()}, function(){
-			// 	console.log("first note set");
-			// 	console.log(quill.getContents());
-			// });
 
-			// $( ".one_note" ).draggable({
-			// 	handle:"#drag"
-			// });
-			// document.getElementsByClassName("ql-editor")[0].addEventListener("blur", function(){
-			// 	store_note("0", quill);
-			// });
-			// document.getElementsByClassName("ql-editor")[0].addEventListener("foucs", function(){
-			// 	update_note("0", quill);
-			// });
 		}
 
 		//has prev saved notes -> new tab 
 		else{
 			//console.log("TODO: handle ext update");
-			chrome.storage.sync.get("id_list", function(res_dict){
+			chrome.storage.local.get("id_list", function(res_dict){
+				print_runtime_error();
 				//TODO: update note when focused
 				for(id of res_dict.id_list){
 					//console.log(id);
@@ -84,12 +74,8 @@ $(document).ready(function(){
 
 function store_note(id, quill){
 	console.log("STORE");
-	chrome.storage.sync.set({[id]:quill.getContents()}, function(){
-		if(chrome.runtime.lastError){
-       /* error */
-	       console.log(chrome.runtime.lastError.message);
-	       return;
-   		}
+	chrome.storage.local.set({[id]:quill.getContents()}, function(){
+		print_runtime_error();
 	});
 }
 
@@ -104,6 +90,7 @@ function store_notes(){
 	Given an ID, creates the related HTML elements with that ID
 */
 function create_note_with_id(id){
+	console.log("create_note with id called");
 	console.assert(typeof(id) === "string");
 	let div_str = "<div class='one_note' id='note" + id + "'></div>";
 	let one_note_div = $(div_str);
@@ -127,18 +114,15 @@ function create_note_with_id(id){
 	NOTE: id should be a STRING
 */
 function create_note_helper(id){
+	console.log("helper");
 	console.assert(typeof(id) === "string");
 	create_note_with_id(id);
 	map_id_quill[id] = new Quill("#editor" + id, {
     	theme: 'snow'
   	});
   	let quill = map_id_quill[id];
-	chrome.storage.sync.set({[id]: quill.getContents()}, function(){
-		if(chrome.runtime.lastError){
-       /* error */
-	       console.log(chrome.runtime.lastError.message);
-	       return;
-   		}
+	chrome.storage.local.set({[id]: quill.getContents()}, function(){
+		print_runtime_error();
 		//console.log("Note " + id + "created - contents saved");
 		//console.log(quill.getContents());
 	});	
@@ -146,7 +130,8 @@ function create_note_helper(id){
 
 function update_note(id, quill){
 	console.log("update_note called");
-	chrome.storage.sync.get(id, function(quill_cont){
+	chrome.storage.local.get(id, function(quill_cont){
+		print_runtime_error();
 		//console.log("quill content: ", quill_cont);
 		quill.setContents(quill_cont[id]);
 	});
@@ -154,7 +139,8 @@ function update_note(id, quill){
 
 //TODO: Need to change to handle delete -> take out the deleted id from map_id_quill
 function update_notes(){
-	chrome.storage.sync.get("id_list", function(id_list_res){
+	chrome.storage.local.get("id_list", function(id_list_res){
+		print_runtime_error();
 		(id_list_res.id_list).forEach(id =>{
 			//note id already exists
 			console.assert(typeof(id) === "string");
@@ -182,47 +168,35 @@ function update_notes(){
 		}
 	});
 
-	// for (var key in map_id_quill){
-	// 	let quill = map_id_quill[key];
-	// 	update_note(key, quill);
-	// }
 }
 
 function create_note(){
 	console.log("create_note called");
-	chrome.storage.sync.get("total_num", function(res){
+	chrome.storage.local.get("total_num", function(res){
+		print_runtime_error();
 		let new_tot = (parseInt(res.total_num) + 1).toString();
-		chrome.storage.sync.set({"total_num": new_tot}, function(){
-			if(chrome.runtime.lastError){
-	       /* error */
-		       console.log(chrome.runtime.lastError.message);
-		       return;
-	   		}
+		chrome.storage.local.set({"total_num": new_tot}, function(){
+			print_runtime_error();
 			//console.log("create: total_num updated");
 			console.log("create_note: new total_num = ", (parseInt(res.total_num) + 1).toString());
-			chrome.storage.sync.get("next_id", function(next_id_res){
-				chrome.storage.sync.set({"next_id":(parseInt(next_id_res.next_id) + 1).toString()}, function(){
-				if(chrome.runtime.lastError){
-			       /* error */
-				       console.log(chrome.runtime.lastError.message);
-				       return;
-			   		}
+			chrome.storage.local.get("next_id", function(next_id_res){
+				print_runtime_error();
+				chrome.storage.local.set({"next_id":(parseInt(next_id_res.next_id) + 1).toString()}, function(){
+					print_runtime_error();
 					//console.log("create: next_id updated");
 					let new_note_id = parseInt(next_id_res.next_id);
-					chrome.storage.sync.get("id_list", function(id_list_result){
+					chrome.storage.local.get("id_list", function(id_list_result){
+						print_runtime_error();
 						id_list_result.id_list.push(new_note_id.toString());
-						chrome.storage.sync.set({"id_list":id_list_result.id_list}, function(){
-							if(chrome.runtime.lastError){
-			       /* error */
-						       console.log(chrome.runtime.lastError.message);
-						       return;
-					   		}
-							create_note_helper(new_note_id.toString());
+						chrome.storage.local.set({"id_list":id_list_result.id_list}, function(){
+							print_runtime_error();
+							console.log("entered");
+	 						create_note_helper(new_note_id.toString());
 						});
-					});
-				})
-			});
-		});
+					}); //okay
+				}) //okay
+			}); //okay
+		}); //okay
 	})
 }
 
@@ -235,17 +209,17 @@ function delete_note(e){
     //console.log("del note id = " + id);
 
     //update related values
-    chrome.storage.sync.get("total_num", function(res_tot){
-    	chrome.storage.sync.set({"total_num" : (parseInt(res_tot.total_num) - 1).toString()}, function(){
-    		chrome.storage.sync.get("id_list", function(res_id_list){
+    chrome.storage.local.get("total_num", function(res_tot){
+    	chrome.storage.local.set({"total_num" : (parseInt(res_tot.total_num) - 1).toString()}, function(){
+    		chrome.storage.local.get("id_list", function(res_id_list){
     			//find the index of the id in id_list
     			ind = res_id_list.id_list.findIndex(elt => elt == id);
     			console.log("ind to be deleted = " + ind);
     			console.assert(ind !== -1);
     			//remove that index
     			res_id_list.id_list.splice(ind, 1);
-    			chrome.storage.sync.set({"id_list": res_id_list.id_list}, function(){
-    				chrome.storage.sync.remove([id], function(){
+    			chrome.storage.local.set({"id_list": res_id_list.id_list}, function(){
+    				chrome.storage.local.remove([id], function(){
     					delete map_id_quill[id];
     					console.log("id = " + id);
     					let elt_to_delete = document.querySelector("#note" + id);
@@ -255,5 +229,11 @@ function delete_note(e){
     		});
     	});
     });
+}
+
+function print_runtime_error(){
+	if(chrome.runtime.lastError){
+		console.log(chrome.runtime.lastError.message);
+	}
 }
 
