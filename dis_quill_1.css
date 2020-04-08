@@ -52,7 +52,12 @@ body{
 }
 
 .del_button{
+	position: absolute;
 	display: inline-block;
+}
+
+.one_note, .ui-draggable{
+	margin-right: 20%;
 }
 /*.one_note,ui-draggable, ui-draggable-handle{
 /*	width: 10%;
