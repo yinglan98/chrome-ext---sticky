@@ -149,7 +149,7 @@ function update_notes(){
 		//TODO: to be tested
 		for (let id in map_id_quill){
 			if(!id_list_res.id_list.includes(id)){
-				delete_note(id);
+				delete_note_helper(id);
 			}
 		}
 	});
@@ -175,6 +175,13 @@ function create_note(){
 	});	
 }
 
+function delete_note_helper(id){
+	delete map_id_quill[id];
+	//console.log("id = " + id);
+	let elt_to_delete = document.querySelector("#note" + id);
+	elt_to_delete.parentNode.removeChild(elt_to_delete);
+}
+
 //Note: the way to get id is dependent on the HTML structure of the note
 function delete_note(e){
 	//console.log("delete note clicked");
@@ -194,14 +201,12 @@ function delete_note(e){
     	chrome.storage.local.set(
     		{"total_num": (parseInt(res_tot.total_num) - 1).toString(), "id_list": res_tot.id_list}, function(){
     			chrome.storage.local.remove([id], function(){
-    					delete map_id_quill[id];
-    					console.log("id = " + id);
-    					let elt_to_delete = document.querySelector("#note" + id);
-    					elt_to_delete.parentNode.removeChild(elt_to_delete);
+    					delete_note_helper(id);
     				})
     	});
     });
 }
+
 
 function print_runtime_error(){
 	if(chrome.runtime.lastError){
