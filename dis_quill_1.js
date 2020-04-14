@@ -57,8 +57,12 @@ $(document).ready(function(){
 
 function store_note(id, quill){
 	console.assert(typeof(id) === "string");
+	let note = document.getElementById("note"+id);
+	let pos_top = get_pos_top(id);
+	let pos_left = get_pos_left(id);
 	//console.log("STORE");
-	chrome.storage.local.set({[id]:quill.getContents()}, function(){
+	chrome.storage.local.set({[id]:
+		{"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left]}}, function(){
 		print_runtime_error();
 	});
 }
@@ -89,7 +93,7 @@ function create_note_with_id(id){
 	one_note_div.append(drag);
 	one_note_div.append(del_button);
 	one_note_div.append(editor);
-	$("body").append(one_note_div);
+	$("#boundary-box").append(one_note_div);
 }
 
 /*
@@ -105,7 +109,11 @@ function create_note_helper(id){
     	theme: 'snow'
   	});
   	let quill = map_id_quill[id];
-	chrome.storage.local.set({[id]: quill.getContents()}, function(){
+  	let pos_top = get_pos_top(id);
+  	let pos_left = get_pos_left(id);
+
+	chrome.storage.local.set({[id]: 
+		{"content": quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left]}}, function(){
 		print_runtime_error();
 		//console.log("Note " + id + "created - contents saved");
 		//console.log(quill.getContents());
@@ -118,7 +126,10 @@ function update_note(id, quill){
 	chrome.storage.local.get(id, function(quill_cont){
 		print_runtime_error();
 		//console.log("quill content: ", quill_cont);
-		quill.setContents(quill_cont[id]);
+		quill.setContents(quill_cont[id].content);
+		let note = document.getElementById("note"+id);
+		note.style.top = quill_cont[id]["pos_top"];
+		note.style.left = quill_cont[id]["pos_left"];
 	});
 }
 
@@ -206,7 +217,17 @@ function delete_note(e){
     });
 }
 
+function get_pos_top(id){
+	console.assert(typeof(id) === "string");
+	let note = document.getElementById("note"+id);
+	return note.style.top;
+}
 
+function get_pos_left(id){
+	console.assert(typeof(id) === "string");
+	let note = document.getElementById("note"+id);
+	return note.style.left;
+}
 function print_runtime_error(){
 	if(chrome.runtime.lastError){
 		console.log(chrome.runtime.lastError.message);

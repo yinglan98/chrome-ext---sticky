@@ -57,8 +57,12 @@ body{
 }
 
 .one_note, .ui-draggable{
+	margin-top:10%;
+	margin-left: 10%;
 	margin-right: 20%;
 }
+
+
 /*.one_note,ui-draggable, ui-draggable-handle{
 /*	width: 10%;
 	height: 10%;*/
