@@ -1,6 +1,6 @@
 var map_id_quill = {};
 $(document).ready(function(){
-	console.log("doc ready");
+	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
 		update_notes();
@@ -11,7 +11,7 @@ $(document).ready(function(){
 	window.addEventListener("beforeunload", store_notes);
 
 	document.getElementById("create_note").addEventListener("click", function(){
-		console.log("create note clicked");
+		//console.log("create note clicked");
 		create_note();
 	});
 
@@ -21,7 +21,7 @@ $(document).ready(function(){
 		let old_tot = parseInt(tot_num.total_num);
 		//console.log("old_tot = ", old_tot);
 		if(old_tot === 0){
-			console.log("no notes to start with");
+			//console.log("no notes to start with");
 			let new_tot = old_tot + 1;
 			chrome.storage.local.set(
 				{"next_id": "1", "total_num": "1", "id_list":["0"]}, function(){
@@ -48,9 +48,6 @@ $(document).ready(function(){
 					let quill = map_id_quill[id];
 					//set the content for the newly create note
 					update_note(id, quill);
-					//attach event for the newly created note
-					let len = document.getElementsByClassName("ql-editor").length;
-
 				}
 			}) //end let
 		} //end else
@@ -59,7 +56,8 @@ $(document).ready(function(){
 
 
 function store_note(id, quill){
-	console.log("STORE");
+	console.assert(typeof(id) === "string");
+	//console.log("STORE");
 	chrome.storage.local.set({[id]:quill.getContents()}, function(){
 		print_runtime_error();
 	});
@@ -76,7 +74,7 @@ function store_notes(){
 	Given an ID, creates the related HTML elements with that ID
 */
 function create_note_with_id(id){
-	console.log("create_note with id called");
+	//console.log("create_note with id called");
 	console.assert(typeof(id) === "string");
 	let div_str = "<div class='one_note' id='note" + id + "'></div>";
 	let one_note_div = $(div_str);
@@ -100,7 +98,7 @@ function create_note_with_id(id){
 	NOTE: id should be a STRING
 */
 function create_note_helper(id){
-	console.log("helper");
+	//console.log("helper");
 	console.assert(typeof(id) === "string");
 	create_note_with_id(id);
 	map_id_quill[id] = new Quill("#editor" + id, {
@@ -115,7 +113,8 @@ function create_note_helper(id){
 }
 
 function update_note(id, quill){
-	console.log("update_note called");
+	console.assert(typeof(id) === "string");
+	//console.log("update_note called");
 	chrome.storage.local.get(id, function(quill_cont){
 		print_runtime_error();
 		//console.log("quill content: ", quill_cont);
@@ -131,13 +130,13 @@ function update_notes(){
 			//note id already exists
 			console.assert(typeof(id) === "string");
 			if (id in map_id_quill){
-				console.log("update note - note with id = " + id + "already exists");
+				//console.log("update note - note with id = " + id + "already exists");
 				let quill = map_id_quill[id];
 				update_note(id, quill);
 			}
 			//Tab is out of date - need to create new note
 			else{
-				console.log("update note - id = " + id + "doesn't exist");
+				//console.log("update note - id = " + id + "doesn't exist");
 				create_note_with_id(id);
 				map_id_quill[id] = new Quill("#editor" + id, {
 		    		theme: 'snow'
@@ -169,7 +168,7 @@ function create_note(){
 		chrome.storage.local.set(
 			{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
 				print_runtime_error();
-				console.log("create note fin update");
+				//console.log("create note fin update");
 				create_note_helper(new_note_id);
 		});
 	});	
