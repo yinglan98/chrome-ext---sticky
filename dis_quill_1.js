@@ -94,6 +94,7 @@ function create_note_with_id(id){
 	one_note_div.append(del_button);
 	one_note_div.append(editor);
 	$("#boundary-box").append(one_note_div);
+	document.getElementById("note"+id).style.position = "fixed";
 }
 
 /*
