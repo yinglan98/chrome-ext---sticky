@@ -52,8 +52,9 @@ body{
 }
 
 .del_button{
-	position: absolute;
+	/*position: absolute;*/
 	display: inline-block;
+	margin-right: 1%;
 }
 
 #boundary-box{

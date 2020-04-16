@@ -87,11 +87,14 @@ function create_note_with_id(id){
 	});
 	let drag = $("<span id='drag'> AHHHHHHHHHH </span>");
 	let del_button = $("<button class = 'del_button'> x </button>");
+	let min_button = $("<button class = 'min_button'> - </button>");
 	del_button.click(delete_note);
+	min_button.click(change_dis);
 	let editor_str = "<div id='editor" + id + "'></div>";
 	let editor = $(editor_str);
 	one_note_div.append(drag);
 	one_note_div.append(del_button);
+	one_note_div.append(min_button);
 	one_note_div.append(editor);
 	$("#boundary-box").append(one_note_div);
 	document.getElementById("note"+id).style.position = "fixed";
@@ -134,7 +137,6 @@ function update_note(id, quill){
 	});
 }
 
-//TODO: Need to change to handle delete -> take out the deleted id from map_id_quill
 function update_notes(){
 	chrome.storage.local.get("id_list", function(id_list_res){
 		print_runtime_error();
@@ -196,9 +198,13 @@ function delete_note_helper(id){
 //Note: the way to get id is dependent on the HTML structure of the note
 function delete_note(e){
 	//console.log("delete note clicked");
-	//detect which note id to delete
-    let str_id = e.target.parentElement.childNodes[3].id;
-    let id = str_id.substring(6);
+	//detect which note id to delete\
+	// console.log(e.target.parentElement);
+	// console.log("e.target.parentElement.id = " + e.target.parentElement.id);
+ //    let str_id = e.target.parentElement.childNodes[3].id;
+ //    let id = str_id.substring(6);
+    let str_id = e.target.parentElement.id;
+    let id = str_id.substring(4);
     //console.log("del note id = " + id);
 
     //update related values
@@ -228,6 +234,19 @@ function get_pos_left(id){
 	console.assert(typeof(id) === "string");
 	let note = document.getElementById("note"+id);
 	return note.style.left;
+}
+
+function change_dis(e){
+	//console.log(e.target);
+	let str_id = e.target.parentElement.id;
+	let id = str_id.substring(4);
+	let editor = document.getElementById("editor"+id);
+	if(editor.style.display === "none"){
+		editor.style.display = "block";
+	}
+	else{
+		editor.style.display = "none";
+	}
 }
 function print_runtime_error(){
 	if(chrome.runtime.lastError){
