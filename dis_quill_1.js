@@ -86,7 +86,7 @@ function create_note_with_id(id){
 	one_note_div.draggable({
 			handle:"#drag"
 	});
-	let drag = $("<span id='drag'> AHHHHHHHHHH </span>");
+	let drag = $("<span id='drag'></span>");
 	let del_button = $("<button class = 'del_button'> x </button>");
 	let min_button = $("<button class = 'min_button'> - </button>");
 	del_button.click(delete_note);
@@ -94,8 +94,10 @@ function create_note_with_id(id){
 	let editor_str = "<div id='editor" + id + "'></div>";
 	let editor = $(editor_str);
 	one_note_div.append(drag);
-	one_note_div.append(del_button);
-	one_note_div.append(min_button);
+	drag.append(del_button);
+	drag.append(min_button);
+	// one_note_div.append(del_button);
+	// one_note_div.append(min_button);
 	one_note_div.append(editor);
 	$("#boundary-box").append(one_note_div);
 	document.getElementById("note"+id).style.position = "fixed";
@@ -206,7 +208,7 @@ function delete_note(e){
 	// console.log("e.target.parentElement.id = " + e.target.parentElement.id);
  //    let str_id = e.target.parentElement.childNodes[3].id;
  //    let id = str_id.substring(6);
-    let str_id = e.target.parentElement.id;
+    let str_id = e.target.parentElement.parentElement.id;
     let id = str_id.substring(4);
     //console.log("del note id = " + id);
 
@@ -241,7 +243,7 @@ function get_pos_left(id){
 
 function change_dis(e){
 	//console.log(e.target);
-	let str_id = e.target.parentElement.id;
+	let str_id = e.target.parentElement.parentElement.id;
 	let id = str_id.substring(4);
 	let editor = document.getElementById("editor"+id);
 	if(editor.style.display === "none"){
