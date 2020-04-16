@@ -60,9 +60,10 @@ function store_note(id, quill){
 	let note = document.getElementById("note"+id);
 	let pos_top = get_pos_top(id);
 	let pos_left = get_pos_left(id);
+	let disp = document.getElementById("editor" + id).style.display;
 	//console.log("STORE");
 	chrome.storage.local.set({[id]:
-		{"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left]}}, function(){
+		{"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left], "display": [disp]}}, function(){
 		print_runtime_error();
 	});
 }
@@ -134,6 +135,8 @@ function update_note(id, quill){
 		let note = document.getElementById("note"+id);
 		note.style.top = quill_cont[id]["pos_top"];
 		note.style.left = quill_cont[id]["pos_left"];
+		let editor = document.getElementById("editor"+id);
+		editor.style.display = quill_cont[id]["display"];
 	});
 }
 
