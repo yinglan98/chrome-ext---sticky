@@ -94,8 +94,8 @@ function create_note_with_id(id){
 	let editor_str = "<div id='editor" + id + "'></div>";
 	let editor = $(editor_str);
 	one_note_div.append(drag);
-	drag.append(del_button);
 	drag.append(min_button);
+	drag.append(del_button);
 	// one_note_div.append(del_button);
 	// one_note_div.append(min_button);
 	one_note_div.append(editor);

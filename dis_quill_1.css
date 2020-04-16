@@ -14,9 +14,7 @@ body{
 #drag{
 	display: inline-block;
 	padding: 0px;
-	width: 100px;
-	height: 15px;
-	margin: 0% 1% 0% 0%;
+	width: 30%;
 	background-color: #c18bc1;
 }
 
@@ -41,7 +39,11 @@ body{
 .del_button{
 	/*position: absolute;*/
 	display: inline-block;
-	margin-right: 1%;
+	background-color: #f57070;
+}
+.min_button{
+	float:right;
+	background-color: #61e861;
 }
 
 #boundary-box{
