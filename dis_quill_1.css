@@ -6,15 +6,14 @@ body{
 }
 .ql-toolbar{
 	display: block;
-	width:30%;
-	height:30%;
+	width:100%;
 	/*float:left;*/
 }
 
 #drag{
 	display: inline-block;
 	padding: 0px;
-	width: 30%;
+	width: 100%;
 	background-color: #c18bc1;
 }
 
@@ -25,8 +24,7 @@ body{
 
 .ql-toolbar.ql-snow + .ql-container.ql-snow{
 	display: inline-block;
-	width: 30%;
-	height: 30%;
+	width: 100%;
 }
 
 #create_note{

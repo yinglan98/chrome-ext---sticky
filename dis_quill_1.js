@@ -1,4 +1,9 @@
-var map_id_quill = {};
+let toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike', 'color'],
+  [{ 'list': 'ordered'}, { 'list': 'bullet' }]
+];
+let map_id_quill = {};
+
 $(document).ready(function(){
 	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
@@ -42,9 +47,7 @@ $(document).ready(function(){
 					//console.log(id);
 					//create html for note
 					create_note_with_id(id);
-					map_id_quill[id] = new Quill("#editor"+id, {
-						theme: 'snow'
-					});
+					create_quill(id);
 					let quill = map_id_quill[id];
 					//set the content for the newly create note
 					update_note(id, quill);
@@ -112,9 +115,7 @@ function create_note_helper(id){
 	//console.log("helper");
 	console.assert(typeof(id) === "string");
 	create_note_with_id(id);
-	map_id_quill[id] = new Quill("#editor" + id, {
-    	theme: 'snow'
-  	});
+	create_quill(id);
   	let quill = map_id_quill[id];
   	let pos_top = get_pos_top(id);
   	let pos_left = get_pos_left(id);
@@ -157,9 +158,7 @@ function update_notes(){
 			else{
 				//console.log("update note - id = " + id + "doesn't exist");
 				create_note_with_id(id);
-				map_id_quill[id] = new Quill("#editor" + id, {
-		    		theme: 'snow'
-  				});
+				create_quill(id);
   				update_note(id, map_id_quill[id]);
 			}
 		}); //end of for each
@@ -252,6 +251,15 @@ function change_dis(e){
 	else{
 		editor.style.display = "none";
 	}
+}
+
+function create_quill(id){
+	map_id_quill[id] = new Quill("#editor"+id, {
+		modules:{
+			toolbar: toolbarOptions
+		},
+		theme: 'snow'
+	});
 }
 function print_runtime_error(){
 	if(chrome.runtime.lastError){
