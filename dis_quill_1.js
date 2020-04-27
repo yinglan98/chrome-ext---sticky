@@ -1,10 +1,13 @@
 let toolbarOptions = [
-  ['bold', 'italic', 'underline', 'strike', 'color'],
+  ['bold', 'italic', 'underline', 'strike', {'color':[]}, {'background':[]}],
   [{ 'list': 'ordered'}, { 'list': 'bullet' }]
 ];
 let map_id_quill = {};
 
 $(document).ready(function(){
+	let color_num = rand_val(0, 360);
+	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
+	document.querySelector("body").style.background = color_val;;
 	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
@@ -87,7 +90,8 @@ function create_note_with_id(id){
 	let div_str = "<div class='one_note' id='note" + id + "'></div>";
 	let one_note_div = $(div_str);
 	one_note_div.draggable({
-			handle:"#drag"
+			handle:"#drag", 
+			containment: "parent"
 	});
 	let drag = $("<span id='drag'></span>");
 	let del_button = $("<button class = 'del_button'> x </button>");
@@ -102,7 +106,8 @@ function create_note_with_id(id){
 	// one_note_div.append(del_button);
 	// one_note_div.append(min_button);
 	one_note_div.append(editor);
-	$("#boundary-box").append(one_note_div);
+	//$("#boundary-box").append(one_note_div);
+	$("body").append(one_note_div);
 	document.getElementById("note"+id).style.position = "fixed";
 }
 
@@ -208,6 +213,7 @@ function delete_note(e){
  //    let str_id = e.target.parentElement.childNodes[3].id;
  //    let id = str_id.substring(6);
     let str_id = e.target.parentElement.parentElement.id;
+    //Note: somewhat hardcoded
     let id = str_id.substring(4);
     //console.log("del note id = " + id);
 
@@ -243,6 +249,7 @@ function get_pos_left(id){
 function change_dis(e){
 	//console.log(e.target);
 	let str_id = e.target.parentElement.parentElement.id;
+	//Note: somewhat hardcoded
 	let id = str_id.substring(4);
 	let editor = document.getElementById("editor"+id);
 	if(editor.style.display === "none"){
@@ -267,3 +274,13 @@ function print_runtime_error(){
 	}
 }
 
+//return a random number between min and max - inclusive on both ends
+function rand_val(min, max){
+	return min + Math.floor((max-min+1) * Math.random());
+}
+
+// function rand_color(min, max){
+// 	let color_num = rand_val(min, max);
+// 	// let color_str = color_num.toString(16);
+// 	// return "#"+color_str;
+// }
