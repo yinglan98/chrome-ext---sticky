@@ -54,3 +54,8 @@ body{
 	margin-top: 10%;
 }
 
+#img{
+	transition-property: transform;
+	transition-duration: 0.5s;
+}
+

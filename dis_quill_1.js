@@ -2,12 +2,20 @@ let toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike', {'color':[]}, {'background':[]}],
   [{ 'list': 'ordered'}, { 'list': 'bullet' }]
 ];
+
+let img_options = ["train.png"];
+
+let animation_dir = 1;
+
 let map_id_quill = {};
 
 $(document).ready(function(){
+	//chose a random background color for the page
 	let color_num = rand_val(0, 360);
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
+
+	move_train();
 	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
@@ -284,3 +292,32 @@ function rand_val(min, max){
 // 	// let color_str = color_num.toString(16);
 // 	// return "#"+color_str;
 // }
+
+function move_train_helper(){
+	//console.log("move_train_helper called");
+	let img = document.getElementById("img");
+	let img_left_str = img.style.left;
+	let img_left_num = parseInt(img_left_str.substring(0, img_left_str.length - 2));
+	if(img_left_num > window.innerWidth - parseInt(img.offsetWidth)){
+		animation_dir = -1;
+		img.style.transform = "scaleX(-1)";
+	}
+	else if(img_left_num <= 5){
+		img.style.transform = "scaleX(1)";
+		animation_dir = 1;
+	}
+	img_left_num += (3* animation_dir);
+	img.style.left = img_left_num.toString() + "px";
+}
+
+function move_train(){
+	let img = document.getElementById("img");
+	img.style.position = "fixed";
+	img.style.left = "10px";
+	img.style.width = "20%";
+	setInterval(move_train_helper, 30);
+}
+
+
+
+
