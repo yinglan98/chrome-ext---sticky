@@ -298,11 +298,11 @@ function move_train_helper(){
 	let img = document.getElementById("img");
 	let img_left_str = img.style.left;
 	let img_left_num = parseInt(img_left_str.substring(0, img_left_str.length - 2));
-	if(img_left_num > window.innerWidth - parseInt(img.offsetWidth)){
+	if(img_left_num >= 0.70 * window.innerWidth - parseInt(img.offsetWidth)){
 		animation_dir = -1;
 		img.style.transform = "scaleX(-1)";
 	}
-	else if(img_left_num <= 5){
+	else if(img_left_num < 0.30 * window.innerWidth){
 		img.style.transform = "scaleX(1)";
 		animation_dir = 1;
 	}
@@ -313,8 +313,11 @@ function move_train_helper(){
 function move_train(){
 	let img = document.getElementById("img");
 	img.style.position = "fixed";
-	img.style.left = "10px";
-	img.style.width = "20%";
+	let left_dist = 0.30*window.innerWidth;
+	img.style.left = left_dist.toString() + "px";
+	let top_dist = 0.40 * window.innerHeight;
+	img.style.top = top_dist.toString() + "px";
+	img.style.width = "10%";
 	setInterval(move_train_helper, 30);
 }
 
