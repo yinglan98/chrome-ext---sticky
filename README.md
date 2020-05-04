@@ -1,4 +1,4 @@
-#Chrome Extension: New Tab Sticky Note
+__Chrome Extension: New Tab Sticky Note__
     This chrome extension overrides the new tab page so that when a new tab page is opened, the user can takes notes in the sticky note, create new sticky notes, and when the user leaves the new tab page the notes are automatically saved in the chrome extension. 
 
 __Getting Started__
