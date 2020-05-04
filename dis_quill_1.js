@@ -10,13 +10,12 @@ let animation_dir = 1;
 let map_id_quill = {};
 
 $(document).ready(function(){
-	test_persis();
+	// test_persis();
 	//chose a random background color for the page
 	let color_num = rand_val(0, 360);
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
 	add_anim();
-	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
 		update_notes();
