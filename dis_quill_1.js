@@ -3,19 +3,19 @@ let toolbarOptions = [
   [{ 'list': 'ordered'}, { 'list': 'bullet' }]
 ];
 
-let img_options = ["train.png"];
+let img_options = ["cat_1.png", "fish_1.png", "fish_2.png", "train_1.png", "sheep_1.png", "sheep_2.png"];
 
 let animation_dir = 1;
 
 let map_id_quill = {};
 
 $(document).ready(function(){
+	test_persis();
 	//chose a random background color for the page
 	let color_num = rand_val(0, 360);
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
-
-	move_train();
+	add_anim();
 	//console.log("doc ready");
 	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
@@ -293,8 +293,7 @@ function rand_val(min, max){
 // 	// return "#"+color_str;
 // }
 
-function move_train_helper(){
-	//console.log("move_train_helper called");
+function move_anim_helper(){
 	let img = document.getElementById("img");
 	let img_left_str = img.style.left;
 	let img_left_num = parseInt(img_left_str.substring(0, img_left_str.length - 2));
@@ -310,7 +309,7 @@ function move_train_helper(){
 	img.style.left = img_left_num.toString() + "px";
 }
 
-function move_train(){
+function move_anim(){
 	let img = document.getElementById("img");
 	img.style.position = "fixed";
 	let left_dist = 0.30*window.innerWidth;
@@ -318,9 +317,20 @@ function move_train(){
 	let top_dist = 0.40 * window.innerHeight;
 	img.style.top = top_dist.toString() + "px";
 	img.style.width = "10%";
-	setInterval(move_train_helper, 30);
+	setInterval(move_anim_helper, 30);
 }
 
+function add_anim(){
+	//chose a random image
+	let img_id = rand_val(0, img_options.length - 1);
+	//add img to html
+	let anim_img = $("<img src = 'images/" + img_options[img_id] + "' id='img'>");
+	$("body").append(anim_img);
+	move_anim();
+}
 
-
-
+function test_persis(){
+	chrome.storage.local.get("id_list", function(res_dict){
+	    console.log(res_dict.id_list);
+	});
+}
