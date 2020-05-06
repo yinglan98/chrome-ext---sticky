@@ -11,11 +11,11 @@ This chrome extension overrides the new tab page so that when a new tab page is 
 5. When you open up a new tab, you should now be able to see the overidden tab page that allow note taking. 
 
 # Built With
-JS
-HTML
-CSS
-quilljs(https://quilljs.com/docs/quickstart/)
+JS 
+HTML 
+CSS 
+quilljs(https://quilljs.com/docs/quickstart/) 
 
 # Contributing
-quilljs(https://quilljs.com/docs/quickstart/)
+quilljs(https://quilljs.com/docs/quickstart/) 
 images from https://www.pngfind.com
