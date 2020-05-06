@@ -16,7 +16,6 @@ $(document).ready(function(){
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
 	add_anim();
-	//TODO: currently map_id_quill is not used -> if no need at end -> delete and update rest of code
 	$(window).focus(function(){
 		update_notes();
 	});
@@ -26,7 +25,6 @@ $(document).ready(function(){
 	window.addEventListener("beforeunload", store_notes);
 
 	document.getElementById("create_note").addEventListener("click", function(){
-		//console.log("create note clicked");
 		create_note();
 	});
 
@@ -67,7 +65,13 @@ $(document).ready(function(){
 	});
 });
 
+/*
+	Store the information of the note into browser memory
 
+	Param id: {string} id for the note
+	Param quill: {quill object} that contains the note
+	Returns: None
+*/
 function store_note(id, quill){
 	console.assert(typeof(id) === "string");
 	let note = document.getElementById("note"+id);
@@ -81,6 +85,9 @@ function store_note(id, quill){
 	});
 }
 
+/*
+	Store the information of all the notes into browser memory
+*/
 function store_notes(){
 	for (var key in map_id_quill){
 		let quill = map_id_quill[key];
@@ -89,7 +96,9 @@ function store_notes(){
 }
 
 /*
-	Given an ID, creates the related HTML elements with that ID
+	Create the related HTML elements for a note with the given ID
+	This is a helper function used in create_note_helper()
+	Param id: {string} id of the note
 */
 function create_note_with_id(id){
 	//console.log("create_note with id called");
@@ -119,9 +128,9 @@ function create_note_with_id(id){
 }
 
 /*
-	Create Quill + related updates for the newly created note
+	Create Quill and related updates for the newly created note
 	Create the HTML side as well
-	NOTE: id should be a STRING
+	Param: {string} id of the note
 */
 function create_note_helper(id){
 	//console.log("helper");
@@ -140,6 +149,13 @@ function create_note_helper(id){
 	});	
 }
 
+/*
+
+	This serves as helper function to update notes
+	Param: {string} id of the note to be updated
+	Param: {quill object} quill object associated with that note
+*/
+
 function update_note(id, quill){
 	console.assert(typeof(id) === "string");
 	//console.log("update_note called");
@@ -154,7 +170,10 @@ function update_note(id, quill){
 		editor.style.display = quill_cont[id]["display"];
 	});
 }
-
+/*
+	when the user get to the new tab page after being away, the page needs to be updated with 
+	the most recent info
+*/
 function update_notes(){
 	chrome.storage.local.get("id_list", function(id_list_res){
 		print_runtime_error();
@@ -185,6 +204,10 @@ function update_notes(){
 
 }
 
+/*
+	called when the user click the create ntoe button
+*/
+
 function create_note(){
 	console.log("create_note called");
 	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
@@ -204,6 +227,11 @@ function create_note(){
 	});	
 }
 
+/*
+	helper of delete_note: remove the note from HTML
+	param: {string} id of the note to be removed
+
+*/
 function delete_note_helper(id){
 	delete map_id_quill[id];
 	//console.log("id = " + id);
@@ -211,6 +239,10 @@ function delete_note_helper(id){
 	elt_to_delete.parentNode.removeChild(elt_to_delete);
 }
 
+/*
+	called when user clicks delete note button
+	param: {event} the button click event
+*/
 //Note: the way to get id is dependent on the HTML structure of the note
 function delete_note(e){
 	//console.log("delete note clicked");
@@ -241,18 +273,30 @@ function delete_note(e){
     });
 }
 
+/*
+	return the note's style.top
+	param: {id} the note's id
+*/
 function get_pos_top(id){
 	console.assert(typeof(id) === "string");
 	let note = document.getElementById("note"+id);
 	return note.style.top;
 }
 
+/*
+	return the note's style.left
+	param: {string} the note's id
+*/
 function get_pos_left(id){
 	console.assert(typeof(id) === "string");
 	let note = document.getElementById("note"+id);
 	return note.style.left;
 }
 
+/*
+	called when user clicks the minimization button for a note
+	param: {event} button click event of the minimization button
+*/
 function change_dis(e){
 	//console.log(e.target);
 	let str_id = e.target.parentElement.parentElement.id;
@@ -267,6 +311,10 @@ function change_dis(e){
 	}
 }
 
+/*
+	helper function to create a new quill given the id
+	param: {string} id of the html element that the quill object should link to
+*/
 function create_quill(id){
 	map_id_quill[id] = new Quill("#editor"+id, {
 		modules:{
@@ -275,13 +323,21 @@ function create_quill(id){
 		theme: 'snow'
 	});
 }
+
+/*
+	helper function that prints chrome memory get / store error
+*/
 function print_runtime_error(){
 	if(chrome.runtime.lastError){
 		console.log(chrome.runtime.lastError.message);
 	}
 }
 
-//return a random number between min and max - inclusive on both ends
+/*
+	helper function that return a random number between min and max - inclusive on both ends
+	param: {int} lower bond of the interval
+	param: {int} upper bond of the interval
+*/
 function rand_val(min, max){
 	return min + Math.floor((max-min+1) * Math.random());
 }
@@ -291,7 +347,10 @@ function rand_val(min, max){
 // 	// let color_str = color_num.toString(16);
 // 	// return "#"+color_str;
 // }
-
+/*
+	a helper function to move_anim. This function gets repearely called and move the
+	img element back and forth
+*/
 function move_anim_helper(){
 	let img = document.getElementById("img");
 	let img_left_str = img.style.left;
@@ -307,7 +366,9 @@ function move_anim_helper(){
 	img_left_num += (3* animation_dir);
 	img.style.left = img_left_num.toString() + "px";
 }
-
+/*
+	move the img elt
+*/ 
 function move_anim(){
 	let img = document.getElementById("img");
 	img.style.position = "fixed";
@@ -318,7 +379,9 @@ function move_anim(){
 	img.style.width = "10%";
 	setInterval(move_anim_helper, 30);
 }
-
+/*
+	randomly chooses an image add attach it to the html
+*/
 function add_anim(){
 	//chose a random image
 	let img_id = rand_val(0, img_options.length - 1);
@@ -328,6 +391,10 @@ function add_anim(){
 	move_anim();
 }
 
+/*
+	prints out the id_list from chrome storage to check
+	used to check if memory is persistent across updates.
+*/
 function test_persis(){
 	chrome.storage.local.get("id_list", function(res_dict){
 	    console.log(res_dict.id_list);
