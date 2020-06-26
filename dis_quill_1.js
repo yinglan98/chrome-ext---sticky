@@ -8,6 +8,11 @@ let img_options = ["cat_1.png", "fish_1.png", "fish_2.png", "train_1.png", "shee
 let animation_dir = 1;
 
 let map_id_quill = {};
+let loc_total_num = 0;
+let loc_next_id = 0;
+let loc_id_list = [];
+let loc_id_cont = {};
+
 
 $(document).ready(function(){
 	// test_persis();
@@ -139,6 +144,26 @@ function create_note_helper(id){
 }
 
 /*
+	called when the user click the create ntoe button
+*/
+function create_note(){
+	console.log("create_note called");
+	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
+		print_runtime_error();
+		let new_tot = (parseInt(res.total_num) + 1).toString();
+		let new_id = (parseInt(res.next_id) + 1).toString();
+		let new_note_id = res.next_id.toString();
+		(res.id_list).push(new_note_id)
+		chrome.storage.local.set(
+			{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
+				print_runtime_error();
+				//console.log("create note fin update");
+				create_note_helper(new_note_id);
+		});
+	});	
+}
+
+/*
 
 	This serves as helper function to update notes
 	Param: {string} id of the note to be updated
@@ -187,26 +212,6 @@ function update_notes(){
 		}
 	});
 
-}
-
-/*
-	called when the user click the create ntoe button
-*/
-function create_note(){
-	console.log("create_note called");
-	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
-		print_runtime_error();
-		let new_tot = (parseInt(res.total_num) + 1).toString();
-		let new_id = (parseInt(res.next_id) + 1).toString();
-		let new_note_id = res.next_id.toString();
-		(res.id_list).push(new_note_id)
-		chrome.storage.local.set(
-			{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
-				print_runtime_error();
-				//console.log("create note fin update");
-				create_note_helper(new_note_id);
-		});
-	});	
 }
 
 /*
@@ -299,15 +304,6 @@ function create_quill(id){
 }
 
 /*
-	helper function that prints chrome memory get / store error
-*/
-function print_runtime_error(){
-	if(chrome.runtime.lastError){
-		console.log(chrome.runtime.lastError.message);
-	}
-}
-
-/*
 	helper function that return a random number between min and max - inclusive on both ends
 	param: {int} lower bond of the interval
 	param: {int} upper bond of the interval
@@ -373,4 +369,13 @@ function test_persis(){
 	chrome.storage.local.get("id_list", function(res_dict){
 	    console.log(res_dict.id_list);
 	});
+}
+
+/*
+	helper function that prints chrome memory get / store error
+*/
+function print_runtime_error(){
+	if(chrome.runtime.lastError){
+		console.log(chrome.runtime.lastError.message);
+	}
 }
