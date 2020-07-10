@@ -20,7 +20,7 @@ let reenter = false;
 $(document).ready(function(){
 	// test_persis();
 	//chose a random background color for the page
-	$(document).focus();
+	//$(document).focus();
 	let color_num = rand_val(0, 360);
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
@@ -40,10 +40,10 @@ $(document).ready(function(){
 		create_note();
 	});
 
-	chrome.storage.local.get("total_num", function(tot_num){
+	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res_dict){
 		print_runtime_error();
 		//no notes yet - create new note
-		let old_tot = parseInt(tot_num.total_num);
+		let old_tot = parseInt(res_dict.total_num);
 		console.log("old_tot = " + old_tot);
 		if(old_tot === 0){
 			//let new_tot = old_tot + 1;
@@ -62,23 +62,20 @@ $(document).ready(function(){
 
 		//has prev saved notes -> new tab 
 		else{
-			chrome.storage.local.get(["next_id", "id_list", "total_num"], function(res_dict){
-				//updating local variables
-				print_runtime_error();
-				loc_total_num = res_dict.total_num;
-				loc_next_id = res_dict.next_id;
-				//copying array
-				loc_id_list = [...res_dict.id_list];
-				//TODO: update note when focused
-				for(id of res_dict.id_list){
-					//create html for note
-					create_note_with_id(id);
-					create_quill(id);
-					let quill = map_id_quill[id];
-					//set the content for the newly create note
-					update_note(id, quill);
-				}
-			}) //end let
+			//updating local variables
+			loc_total_num = res_dict.total_num;
+			loc_next_id = res_dict.next_id;
+			//copying array
+			loc_id_list = [...res_dict.id_list];
+			//TODO: update note when focused
+			for(id of res_dict.id_list){
+				//create html for note
+				create_note_with_id(id);
+				create_quill(id);
+				let quill = map_id_quill[id];
+				//set the content for the newly create note
+				update_note(id, quill);
+			}
 		} //end else
 	});
 });
@@ -296,8 +293,9 @@ function delete_note(e){
    	let ind = loc_id_list.findIndex(elt => elt == id);
    	console.assert(ind !== -1);
    	loc_id_list.splice(ind, 1);
+   	delete_note_helper(id);
    	chrome.storage.local.remove([id], function(){
-    	delete_note_helper(id);
+    	//delete_note_helper(id);
     })
 }
 
