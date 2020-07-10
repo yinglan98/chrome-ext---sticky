@@ -62,20 +62,23 @@ $(document).ready(function(){
 
 		//has prev saved notes -> new tab 
 		else{
-			//updating local variables
-			loc_total_num = res_dict.total_num;
-			loc_next_id = res_dict.next_id;
-			//copying array
-			loc_id_list = [...res_dict.id_list];
-			//TODO: update note when focused
-			for(id of res_dict.id_list){
-				//create html for note
-				create_note_with_id(id);
-				create_quill(id);
-				let quill = map_id_quill[id];
-				//set the content for the newly create note
-				update_note(id, quill);
-			}
+			chrome.storage.local.get(res_dict.id_list, function(quill_cont){
+				//updating local variables
+
+				loc_total_num = res_dict.total_num;
+				loc_next_id = res_dict.next_id;
+				//copying array
+				loc_id_list = [...res_dict.id_list];
+				//TODO: update note when focused
+				for(id of res_dict.id_list){
+					//create html for note
+					create_note_with_id(id);
+					create_quill(id);
+					let quill = map_id_quill[id];
+					//set the content for the newly create note
+					update_note(id, quill, quill_cont);
+				}
+			});
 		} //end else
 	});
 });
@@ -202,17 +205,18 @@ function create_note(){
 	Param: {quill object} quill object associated with that note
 */
 
-function update_note(id, quill){
+function update_note(id, quill, quill_cont){
+	console.log("quill_cont = " + quill_cont);
 	console.assert(typeof(id) === "string");
-	chrome.storage.local.get(id, function(quill_cont){
-		print_runtime_error();
-		quill.setContents(quill_cont[id].content);
-		let note = document.getElementById("note"+id);
-		note.style.top = quill_cont[id]["pos_top"];
-		note.style.left = quill_cont[id]["pos_left"];
-		let editor = document.getElementById("editor"+id);
-		editor.style.display = quill_cont[id]["display"];
-	});
+	// chrome.storage.local.get(id, function(quill_cont){
+	//print_runtime_error();
+	quill.setContents(quill_cont[id].content);
+	let note = document.getElementById("note"+id);
+	note.style.top = quill_cont[id]["pos_top"];
+	note.style.left = quill_cont[id]["pos_left"];
+	let editor = document.getElementById("editor"+id);
+	editor.style.display = quill_cont[id]["display"];
+	// });
 }
 /*
 	when the user get to the new tab page after being away, the page needs to be updated with 
@@ -221,32 +225,37 @@ function update_note(id, quill){
 function update_notes(){
 	chrome.storage.local.get(["id_list", "total_num", "next_id"], function(id_list_res){
 		print_runtime_error();
-		(id_list_res.id_list).forEach(id =>{
-			//note id already exists
-			console.assert(typeof(id) === "string");
-			if (id in map_id_quill){
-				//console.log("update note - note with id = " + id + "already exists");
-				let quill = map_id_quill[id];
-				update_note(id, quill);
-			}
-			//Tab is out of date - need to create new note
-			else{
-				create_note_with_id(id);
-				create_quill(id);
-  				update_note(id, map_id_quill[id]);
-			}
-		}); //end of for each
-		//delete from map_id_quill what has already been deleted
-		for (let id in map_id_quill){
-			if(!id_list_res.id_list.includes(id)){
-				delete_note_helper(id);
-			}
-		}
+		chrome.storage.local.get(id_list_res.id_list, function(content_res){
+			console.log("content_res: " + content_res);
 
-		//update local var
-		loc_id_list = [...id_list_res.id_list];
-		loc_next_id = id_list_res.next_id;
-		loc_total_num = id_list_res.total_num;
+			(id_list_res.id_list).forEach(id =>{
+				//note id already exists
+				console.assert(typeof(id) === "string");
+				if (id in map_id_quill){
+					//console.log("update note - note with id = " + id + "already exists");
+					let quill = map_id_quill[id];
+					update_note(id, quill, content_res);
+				}
+				//Tab is out of date - need to create new note
+				else{
+					create_note_with_id(id);
+					create_quill(id);
+	  				update_note(id, map_id_quill[id], content_res);
+				}
+			}); //end of for each
+			//delete from map_id_quill what has already been deleted
+			for (let id in map_id_quill){
+				if(!id_list_res.id_list.includes(id)){
+					delete_note_helper(id);
+				}
+			}
+
+			//update local var
+			loc_id_list = [...id_list_res.id_list];
+			loc_next_id = id_list_res.next_id;
+			loc_total_num = id_list_res.total_num;
+		});
+
 	});
 
 }
