@@ -1,3 +1,6 @@
+let TEST_MODE = true;
+let NO_SAVE = false;
+
 let toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike', {'color':[]}, {'background':[]}],
   [{ 'list': 'ordered'}, { 'list': 'bullet' }]
@@ -8,23 +11,27 @@ let img_options = ["cat_1.png", "fish_1.png", "fish_2.png", "train_1.png", "shee
 let animation_dir = 1;
 
 let map_id_quill = {};
-let loc_total_num = 0;
-let loc_next_id = 0;
+let loc_total_num = "0";
+let loc_next_id = "0";
+//Note: loc_id_list stores a list of strings, not int!
 let loc_id_list = [];
-let loc_id_cont = {};
-
+let reenter = false;
 
 $(document).ready(function(){
 	// test_persis();
 	//chose a random background color for the page
+	$(document).focus();
 	let color_num = rand_val(0, 360);
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
 	add_anim();
 	$(window).focus(function(){
-		update_notes();
+		if(reenter){
+			update_notes();
+		}
 	});
 	$(window).blur(function(){
+		reenter = true;
 		store_notes();
 	})
 	window.addEventListener("beforeunload", store_notes);
@@ -37,12 +44,17 @@ $(document).ready(function(){
 		print_runtime_error();
 		//no notes yet - create new note
 		let old_tot = parseInt(tot_num.total_num);
+		console.log("old_tot = " + old_tot);
 		if(old_tot === 0){
-			let new_tot = old_tot + 1;
-			chrome.storage.local.set(
-				{"next_id": "1", "total_num": "1", "id_list":["0"]}, function(){
-				print_runtime_error();
-			});
+			//let new_tot = old_tot + 1;
+			// chrome.storage.local.set(
+			// 	{"next_id": "1", "total_num": "1", "id_list":["0"]}, function(){
+			// 	print_runtime_error();
+			// });
+			loc_total_num = "1";
+			loc_next_id = "1";
+			loc_id_list = ["0"];
+
 			//create new note with id
 			create_note_helper("0");
 
@@ -50,8 +62,13 @@ $(document).ready(function(){
 
 		//has prev saved notes -> new tab 
 		else{
-			chrome.storage.local.get("id_list", function(res_dict){
+			chrome.storage.local.get(["next_id", "id_list", "total_num"], function(res_dict){
+				//updating local variables
 				print_runtime_error();
+				loc_total_num = res_dict.total_num;
+				loc_next_id = res_dict.next_id;
+				//copying array
+				loc_id_list = [...res_dict.id_list];
 				//TODO: update note when focused
 				for(id of res_dict.id_list){
 					//create html for note
@@ -73,25 +90,38 @@ $(document).ready(function(){
 	Param quill: {quill object} that contains the note
 	Returns: None
 */
-function store_note(id, quill){
+function store_notes_helper(id, quill){
 	console.assert(typeof(id) === "string");
 	let note = document.getElementById("note"+id);
 	let pos_top = get_pos_top(id);
 	let pos_left = get_pos_left(id);
 	let disp = document.getElementById("editor" + id).style.display;
-	chrome.storage.local.set({[id]:
-		{"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left], "display": [disp]}}, function(){
-		print_runtime_error();
-	});
+	// chrome.storage.local.set({[id]:
+	// 	{"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left], "display": [disp]}}, function(){
+	// 	print_runtime_error();
+	// });
+	return {"content":quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left], "display": [disp]};
 }
 
 /*
 	Store the information of all the notes into browser memory
 */
 function store_notes(){
-	for (var key in map_id_quill){
-		let quill = map_id_quill[key];
-		store_note(key, quill);
+	console.log("store_notes called");
+	let to_be_stored = {};
+	for (const id in map_id_quill){
+		console.log("id = " + id);
+		let quill = map_id_quill[id];
+		//to_be_stored["0"] = "random";
+		to_be_stored[id] = store_notes_helper(id, quill);
+	}
+	to_be_stored["total_num"] = loc_total_num;
+	to_be_stored["next_id"] = loc_next_id;
+	to_be_stored["id_list"] = loc_id_list;
+	if(!NO_SAVE){
+		chrome.storage.local.set(to_be_stored ,function(){
+			print_runtime_error();
+		})
 	}
 }
 
@@ -133,14 +163,14 @@ function create_note_helper(id){
 	console.assert(typeof(id) === "string");
 	create_note_with_id(id);
 	create_quill(id);
-  	let quill = map_id_quill[id];
-  	let pos_top = get_pos_top(id);
-  	let pos_left = get_pos_left(id);
+ //  	let quill = map_id_quill[id];
+ //  	let pos_top = get_pos_top(id);
+ //  	let pos_left = get_pos_left(id);
 
-	chrome.storage.local.set({[id]: 
-		{"content": quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left]}}, function(){
-		print_runtime_error();
-	});	
+	// chrome.storage.local.set({[id]: 
+	// 	{"content": quill.getContents(), "pos_top": [pos_top], "pos_left": [pos_left]}}, function(){
+	// 	print_runtime_error();
+	// });	
 }
 
 /*
@@ -148,19 +178,24 @@ function create_note_helper(id){
 */
 function create_note(){
 	console.log("create_note called");
-	chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
-		print_runtime_error();
-		let new_tot = (parseInt(res.total_num) + 1).toString();
-		let new_id = (parseInt(res.next_id) + 1).toString();
-		let new_note_id = res.next_id.toString();
-		(res.id_list).push(new_note_id)
-		chrome.storage.local.set(
-			{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
-				print_runtime_error();
-				//console.log("create note fin update");
-				create_note_helper(new_note_id);
-		});
-	});	
+	// chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
+	// 	print_runtime_error();
+	// 	let new_tot = (parseInt(res.total_num) + 1).toString();
+	// 	let new_id = (parseInt(res.next_id) + 1).toString();
+	// 	let new_note_id = res.next_id.toString();
+	// 	(res.id_list).push(new_note_id)
+	// 	chrome.storage.local.set(
+	// 		{"total_num": new_tot, "next_id": new_id, "id_list": res.id_list}, function(){
+	// 			print_runtime_error();
+	// 			//console.log("create note fin update");
+	// 			create_note_helper(new_note_id);
+	// 	});
+	// });
+	create_note_helper(loc_next_id);
+	loc_total_num = (parseInt(loc_total_num) + 1).toString();
+	loc_id_list.push(loc_next_id);
+	loc_next_id = (parseInt(loc_next_id) + 1).toString();
+
 }
 
 /*
@@ -187,7 +222,7 @@ function update_note(id, quill){
 	the most recent info
 */
 function update_notes(){
-	chrome.storage.local.get("id_list", function(id_list_res){
+	chrome.storage.local.get(["id_list", "total_num", "next_id"], function(id_list_res){
 		print_runtime_error();
 		(id_list_res.id_list).forEach(id =>{
 			//note id already exists
@@ -210,6 +245,11 @@ function update_notes(){
 				delete_note_helper(id);
 			}
 		}
+
+		//update local var
+		loc_id_list = [...id_list_res.id_list];
+		loc_next_id = id_list_res.next_id;
+		loc_total_num = id_list_res.total_num;
 	});
 
 }
@@ -237,20 +277,28 @@ function delete_note(e){
     let id = str_id.substring(4);
 
     //update related values
-    chrome.storage.local.get(["total_num", "id_list"], function(res_tot){
-	//find the index of the id in id_list
-		let ind = res_tot.id_list.findIndex(elt => elt == id);
-		console.log("ind to be deleted = " + ind);
-		console.assert(ind !== -1);
-		//remove that index
-		res_tot.id_list.splice(ind, 1);
-    	chrome.storage.local.set(
-    		{"total_num": (parseInt(res_tot.total_num) - 1).toString(), "id_list": res_tot.id_list}, function(){
-    			chrome.storage.local.remove([id], function(){
-    					delete_note_helper(id);
-    				})
-    	});
-    });
+ //    chrome.storage.local.get(["total_num", "id_list"], function(res_tot){
+	// //find the index of the id in id_list
+	// 	let ind = res_tot.id_list.findIndex(elt => elt == id);
+	// 	console.log("ind to be deleted = " + ind);
+	// 	console.assert(ind !== -1);
+	// 	//remove that index
+	// 	res_tot.id_list.splice(ind, 1);
+ //    	// chrome.storage.local.set(
+ //    	// 	{"total_num": (parseInt(res_tot.total_num) - 1).toString(), "id_list": res_tot.id_list}, function(){
+ //    	// 		chrome.storage.local.remove([id], function(){
+ //    	// 				delete_note_helper(id);
+ //    	// 			})
+ //    	// });
+ //    });
+
+    loc_total_num = (parseInt(loc_total_num) - 1).toString();
+   	let ind = loc_id_list.findIndex(elt => elt == id);
+   	console.assert(ind !== -1);
+   	loc_id_list.splice(ind, 1);
+   	chrome.storage.local.remove([id], function(){
+    	delete_note_helper(id);
+    })
 }
 
 /*
@@ -295,6 +343,7 @@ function change_dis(e){
 	param: {string} id of the html element that the quill object should link to
 */
 function create_quill(id){
+	console.assert(typeof(id) === "string");
 	map_id_quill[id] = new Quill("#editor"+id, {
 		modules:{
 			toolbar: toolbarOptions
