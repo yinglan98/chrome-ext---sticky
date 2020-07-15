@@ -223,7 +223,10 @@ function create_note(){
 	loc_total_num = (parseInt(loc_total_num) + 1).toString();
 	loc_id_list.push(loc_next_id);
 	loc_next_id = (parseInt(loc_next_id) + 1).toString();
-
+	if(TEST_MODE){
+		console.assert(parseInt(loc_total_num) === loc_id_list.length);
+		console.assert(parseInt(loc_total_num) === Object.keys(map_id_quill).length);
+	}
 }
 
 /*
@@ -293,7 +296,10 @@ function update_notes(){
 	loc_next_id = res_dict.next_id;
 	loc_total_num = res_dict.total_num;
 		// });
-
+	if(TEST_MODE){
+		console.assert(parseInt(loc_total_num) === loc_id_list.length);
+		console.assert(parseInt(loc_total_num) === Object.keys(map_id_quill).length);
+	}
 	// });
 }
 
@@ -348,6 +354,10 @@ function delete_note(e){
     // 	//delete_note_helper(id);
     // })
     back_page.delete_quill_mem(id);
+    if(TEST_MODE){
+		console.assert(parseInt(loc_total_num) === loc_id_list.length);
+		console.assert(parseInt(loc_total_num) === Object.keys(map_id_quill).length);
+	}
 }
 
 /*
@@ -355,7 +365,9 @@ function delete_note(e){
 	param: {id} the note's id
 */
 function get_pos_top(id){
-	console.assert(typeof(id) === "string");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	let note = document.getElementById("note"+id);
 	return note.style.top;
 }
@@ -365,7 +377,9 @@ function get_pos_top(id){
 	param: {string} the note's id
 */
 function get_pos_left(id){
-	console.assert(typeof(id) === "string");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	let note = document.getElementById("note"+id);
 	return note.style.left;
 }
@@ -392,7 +406,9 @@ function change_dis(e){
 	param: {string} id of the html element that the quill object should link to
 */
 function create_quill(id){
-	console.assert(typeof(id) === "string");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	map_id_quill[id] = new Quill("#editor"+id, {
 		modules:{
 			toolbar: toolbarOptions

@@ -18,9 +18,10 @@ chrome.storage.local.get(["total_num", "next_id", "id_list", "all_quills"], func
 	print_details("memory from chrome" + JSON.stringify(res_dict));
 	let curr_total_num = parseInt(res_dict["total_num"]);
 	if(res_dict["total_num"] && curr_total_num > 0){
-		print_details("already has memory \n" + memory["total_num"]);
+		print_details("already has memory \n");
 		if(TEST_MODE){
 			console.assert(curr_total_num === Object.keys(res_dict["all_quills"]).length);
+			console.assert(curr_total_num === res_dict["id_list"].length);
 		}
 		memory["total_num"] = res_dict.total_num;
 		memory["next_id"] = res_dict.next_id;
@@ -72,6 +73,11 @@ function set_variables(var_list){
 	print_details("set_variables called");
 	print_details("set_variables param var_list: \n" + var_list);
 	memory = JSON.parse(var_list);
+	if(TEST_MODE){
+		console.assert(parseInt(memory["total_num"]) === Object.keys(memory["all_quills"]).length);
+		console.assert(parseInt(memory["total_num"]) === memory["id_list"].length);
+	}
+
 	chrome.storage.local.set(memory,function(){
 		print_runtime_error();
 		print_details("finished saving to chrome memory");
