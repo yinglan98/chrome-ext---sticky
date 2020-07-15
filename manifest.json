@@ -2,7 +2,7 @@
 	"name": "stickynote tab",
 	"version": "1.1",
 	"description": "override the new tab page so that user can create sticky notes to take notes",
-	"permissions": ["storage"],
+	"permissions": ["storage", "tabs"],
 	"manifest_version" : 2,
     "chrome_url_overrides" : {
     	"newtab": "dis_quill_1.html"
