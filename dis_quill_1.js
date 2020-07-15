@@ -1,27 +1,8 @@
-/*
-testing message passing
-*/
-// let page = chrome.extension.getBackgroundPage();
-// console.log("dis_quill: temp = " + page.increase_temp());
-// chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-//   console.log(response.farewell);
-// });
-// chrome.runtime.sendMessage({greeting: "2"}, function(response) {
-//   console.log(response.farewell);
-// });
 
-// chrome.runtime.onMessage.addListener(
-//   function(request, sender, sendResponse) {
-//     // console.log(sender.tab ?
-//     //             "from a content script:" + sender.tab.url :
-//     //             "from the extension");
-//     if (request.greeting == "hello")
-//       console.log("dis_quill.js received msg" + request.greeting);
-//   });
-
-//end testing
 let TEST_MODE = true;
 let NO_SAVE = false;
+print_details("TEST_MODE = " + TEST_MODE);
+print_details("NO_SAVE = " + NO_SAVE);
 
 let toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike', {'color':[]}, {'background':[]}],
@@ -55,6 +36,7 @@ $(document).ready(function(){
 	document.querySelector("body").style.background = color_val;;
 	add_anim();
 	$(window).focus(function(){
+		print_details("window.focus(): reenter = " + reenter);
 		if(reenter){
 			update_notes();
 		}
@@ -73,11 +55,11 @@ $(document).ready(function(){
 	// 	print_runtime_error();
 	let temp = back_page.get_variables(["total_num", "next_id", "id_list", "all_quills"]);
 	let res_dict = JSON.parse(temp);
-	console.log("res_dict = " + res_dict);
+	print_details("document.ready(): res_dict = \n" + res_dict);
 		//no notes yet - create new note
 	let old_tot = parseInt(res_dict["total_num"]);
-	console.log("old_tot = " + old_tot);
 	if(old_tot === 0){
+		print_details("document.ready(): old_tot === 0");
 		//let new_tot = old_tot + 1;
 		// chrome.storage.local.set(
 		// 	{"next_id": "1", "total_num": "1", "id_list":["0"]}, function(){
@@ -94,6 +76,7 @@ $(document).ready(function(){
 
 	//has prev saved notes -> new tab 
 	else{
+		print_details("document.ready(): old_tot != 0");
 		// chrome.storage.local.get(res_dict.id_list, function(quill_cont){
 			//updating local variables
 
@@ -123,7 +106,10 @@ $(document).ready(function(){
 	Returns: None
 */
 function store_notes_helper(id, quill){
-	console.assert(typeof(id) === "string");
+	print_details("store_notes_helper called");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	let note = document.getElementById("note"+id);
 	let pos_top = get_pos_top(id);
 	let pos_left = get_pos_left(id);
@@ -167,7 +153,10 @@ function store_notes(){
 	Param id: {string} id of the note
 */
 function create_note_with_id(id){
-	console.assert(typeof(id) === "string");
+	print_details("create_note_with_id called");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	let div_str = "<div class='one_note' id='note" + id + "'></div>";
 	let one_note_div = $(div_str);
 	one_note_div.draggable({
@@ -195,8 +184,11 @@ function create_note_with_id(id){
 	Param: {string} id of the note
 */
 function create_note_helper(id){
+	print_details("create_note_helper called with id = " + id);
 	//console.log("helper");
-	console.assert(typeof(id) === "string");
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	create_note_with_id(id);
 	create_quill(id);
  //  	let quill = map_id_quill[id];
@@ -213,7 +205,7 @@ function create_note_helper(id){
 	called when the user click the create ntoe button
 */
 function create_note(){
-	console.log("create_note called");
+	print_details("create_note called");
 	// chrome.storage.local.get(["total_num", "next_id", "id_list"], function(res){
 	// 	print_runtime_error();
 	// 	let new_tot = (parseInt(res.total_num) + 1).toString();
@@ -242,8 +234,10 @@ function create_note(){
 */
 
 function update_note(id, quill, quill_cont){
-	console.log("quill_cont = " + quill_cont);
-	console.assert(typeof(id) === "string");
+	print_details("update_note called: quill_cont param = \n" + quill_cont);
+	if(TEST_MODE){
+		console.assert(typeof(id) === "string");
+	}
 	// chrome.storage.local.get(id, function(quill_cont){
 	//print_runtime_error();
 	quill.setContents(quill_cont[id].content);
@@ -263,42 +257,44 @@ function update_notes(){
 		//print_runtime_error();
 		// chrome.storage.local.get(id_list_res.id_list, function(content_res){
 		// 	console.log("content_res: " + content_res);
+	print_details("update_notes called");
+	let temp = back_page.get_variables(["total_num", "next_id", "id_list", "all_quills"]);
+	print_details("update_notes: get_variables returned: \n" + temp);
+	let res_dict = JSON.parse(temp);
 
-		let temp = back_page.get_variables(["total_num", "next_id", "id_list", "all_quills"]);
-		let res_dict = JSON.parse(temp);
+	(res_dict.id_list).forEach(id =>{
+		//note id already exists
+		if(TEST_MODE){
+			console.assert(typeof(id) === "string");
+		}
+		if (id in map_id_quill){
+			//console.log("update note - note with id = " + id + "already exists");
+			let quill = map_id_quill[id];
+			print_details("res_dict.all_quills = " + res_dict.all_quills);
+			update_note(id, quill, res_dict.all_quills);
+		}
+		//Tab is out of date - need to create new note
+		else{
+			create_note_with_id(id);
+			create_quill(id);
+			print_details("res_dict.all_quills = " + res_dict.all_quills);
+				update_note(id, map_id_quill[id], res_dict.all_quills);
+		}
+	}); //end of for each
+	//delete from map_id_quill what has already been deleted
+	for (let id in map_id_quill){
+		if(!res_dict.id_list.includes(id)){
+			delete_note_helper(id);
+		}
+	}
 
-			(res_dict.id_list).forEach(id =>{
-				//note id already exists
-				console.assert(typeof(id) === "string");
-				if (id in map_id_quill){
-					//console.log("update note - note with id = " + id + "already exists");
-					let quill = map_id_quill[id];
-					print_details("res_dict.all_quills = " + res_dict.all_quills);
-					update_note(id, quill, res_dict.all_quills);
-				}
-				//Tab is out of date - need to create new note
-				else{
-					create_note_with_id(id);
-					create_quill(id);
-					print_details("res_dict.all_quills = " + res_dict.all_quills);
-	  				update_note(id, map_id_quill[id], res_dict.all_quills);
-				}
-			}); //end of for each
-			//delete from map_id_quill what has already been deleted
-			for (let id in map_id_quill){
-				if(!res_dict.id_list.includes(id)){
-					delete_note_helper(id);
-				}
-			}
-
-			//update local var
-			loc_id_list = [...res_dict.id_list];
-			loc_next_id = res_dict.next_id;
-			loc_total_num = res_dict.total_num;
+	//update local var
+	loc_id_list = [...res_dict.id_list];
+	loc_next_id = res_dict.next_id;
+	loc_total_num = res_dict.total_num;
 		// });
 
 	// });
-
 }
 
 /*
@@ -307,6 +303,7 @@ function update_notes(){
 
 */
 function delete_note_helper(id){
+	print_details("delete_note _helper called: to delete id = " + id);
 	delete map_id_quill[id];
 	let elt_to_delete = document.querySelector("#note" + id);
 	elt_to_delete.parentNode.removeChild(elt_to_delete);
@@ -318,6 +315,7 @@ function delete_note_helper(id){
 */
 //Note: the way to get id is dependent on the HTML structure of the note
 function delete_note(e){
+	print_details("delete_note called");
 	//detect which note id to delete\
     let str_id = e.target.parentElement.parentElement.id;
     //Note: somewhat hardcoded
@@ -341,7 +339,9 @@ function delete_note(e){
 
     loc_total_num = (parseInt(loc_total_num) - 1).toString();
    	let ind = loc_id_list.findIndex(elt => elt == id);
-   	console.assert(ind !== -1);
+   	if(TEST_MODE){
+	   	console.assert(ind !== -1);
+	}
    	loc_id_list.splice(ind, 1);
    	delete_note_helper(id);
    	// chrome.storage.local.remove([id], function(){
