@@ -10,5 +10,8 @@
   	"background":{
 		"scripts": ["background.js"],
 		"persistent": true
-	}
+	},
+	"icons": { "16": "images/sticky_icon_16.png",
+           "48": "images/sticky_icon_48.png",
+          "128": "images/sticky_icon_128.png" }
 }
