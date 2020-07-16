@@ -1,5 +1,5 @@
 
-let TEST_MODE = true;
+let TEST_MODE = false;
 print_details("TEST_MODE = " + TEST_MODE + "\n");
 print_details("background page started running");
 let memory = {};

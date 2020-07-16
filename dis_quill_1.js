@@ -1,5 +1,5 @@
 
-let TEST_MODE = true;
+let TEST_MODE = false;
 let NO_SAVE = false;
 print_details("TEST_MODE = " + TEST_MODE);
 print_details("NO_SAVE = " + NO_SAVE);
