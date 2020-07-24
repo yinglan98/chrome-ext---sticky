@@ -3,6 +3,8 @@ let TEST_MODE = true;
 let NO_SAVE = false;
 print_details("TEST_MODE = " + TEST_MODE);
 print_details("NO_SAVE = " + NO_SAVE);
+let saved = true;
+let save_from_ready = false;
 
 let toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike', {'color':[]}, {'background':[]}],
@@ -35,12 +37,16 @@ $(document).ready(function(){
 	let color_val = "hsla(" + color_num + ", 52%, 87%, 1)";
 	document.querySelector("body").style.background = color_val;;
 	add_anim();
+	//a new tab isn't fovused automatically - need to click on page
 	$(window).focus(function(){
 		print_details("window.focus(): reenter = " + reenter);
+		saved = false;
 		// if(reenter){
-			update_notes();
+		update_notes();
 		// }
 	});
+	// Note: blur only happens when the tab has been focused and then changed to blurred
+	//if a new tab is create and then another tab is created - blur is not called
 	$(window).blur(function(){
 		reenter = true;
 		store_notes();
@@ -71,6 +77,7 @@ $(document).ready(function(){
 
 		//create new note with id
 		create_note_helper("0");
+		save_from_ready = true;
 		store_notes();
 
 	}
@@ -142,9 +149,13 @@ function store_notes(){
 		// chrome.storage.local.set(to_be_stored ,function(){
 		// 	print_runtime_error();
 		// })
-		print_details("store notes - JSON.stringify(to_be_stored");
-		print_details(JSON.stringify(to_be_stored));
-		back_page.set_variables(JSON.stringify(to_be_stored));
+		if(!saved || save_from_ready){
+			print_details("store notes - JSON.stringify(to_be_stored");
+			print_details(JSON.stringify(to_be_stored));
+			back_page.set_variables(JSON.stringify(to_be_stored));
+			saved = true;
+			save_from_ready = false;
+		}
 	}
 }
 
