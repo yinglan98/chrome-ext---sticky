@@ -1,5 +1,5 @@
 
-let TEST_MODE = false;
+let TEST_MODE = true;
 let NO_SAVE = false;
 print_details("TEST_MODE = " + TEST_MODE);
 print_details("NO_SAVE = " + NO_SAVE);
@@ -18,7 +18,7 @@ let loc_total_num = "0";
 let loc_next_id = "0";
 //Note: loc_id_list stores a list of strings, not int!
 let loc_id_list = [];
-let reenter = false;
+let reenter = false; // currently not used in this design
 let back_page = chrome.extension.getBackgroundPage();
 
 
@@ -37,9 +37,9 @@ $(document).ready(function(){
 	add_anim();
 	$(window).focus(function(){
 		print_details("window.focus(): reenter = " + reenter);
-		if(reenter){
+		// if(reenter){
 			update_notes();
-		}
+		// }
 	});
 	$(window).blur(function(){
 		reenter = true;
@@ -71,6 +71,7 @@ $(document).ready(function(){
 
 		//create new note with id
 		create_note_helper("0");
+		store_notes();
 
 	}
 

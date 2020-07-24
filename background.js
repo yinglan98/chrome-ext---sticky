@@ -67,7 +67,7 @@ function get_variables(var_list){
 /*
 	Set memory to contain same data as var_list
 	Param var_list: {String} a JSON_STRINGIFIED string of all the data that memory should have
-	NOTE: this function is only called during store_notes()
+	NOTE: this function is only called during store_notes() & .ready()
 */
 function set_variables(var_list){
 	print_details("set_variables called");
